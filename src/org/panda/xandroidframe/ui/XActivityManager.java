@@ -13,16 +13,14 @@ import android.app.Activity;
  */
 public class XActivityManager {
 	/** 记录管理器内所有Activity */
-	private Stack<IActivityDescribable> aties;
-	/** 管理器实例 */
-	private static XActivityManager manager;
+	private Stack<IActivityFunction> aties;
 
 	/**
 	 * Single模式 私有构造方法和初始化
 	 */
 	private XActivityManager() {
 		if (null == aties) {
-			aties = new Stack<IActivityDescribable>();
+			aties = new Stack<IActivityFunction>();
 		}
 	}
 
@@ -32,14 +30,13 @@ public class XActivityManager {
 	 * @return
 	 */
 	public static XActivityManager getManager() {
-		if (null == manager) {
-			synchronized (XActivityManager.class) {
-				if (null == manager) {
-					manager = new XActivityManager();
-				}
-			}
-		}
-		return manager;
+
+		return XActivityManagerHolder.manager;
+	}
+
+	// 单例使用静态内部类实现 懒加载。
+	public static class XActivityManagerHolder {
+		private static final XActivityManager manager = new XActivityManager();
 	}
 
 	/**
@@ -56,7 +53,7 @@ public class XActivityManager {
 	 * 
 	 * @param aty
 	 */
-	public void addActivity(IActivityDescribable aty) {
+	public void addActivity(IActivityFunction aty) {
 		aties.add(aty);
 	}
 
@@ -79,8 +76,8 @@ public class XActivityManager {
 	 * @return
 	 */
 	public Activity findActivity(Class<?> clazz) {
-		IActivityDescribable aty = null;
-		for (IActivityDescribable activity : aties) {
+		IActivityFunction aty = null;
+		for (IActivityFunction activity : aties) {
 			if (activity.getClass().equals(clazz)) {
 				aty = activity;
 				break;
@@ -117,7 +114,7 @@ public class XActivityManager {
 	 * @param clazz
 	 */
 	public void finishOtherActivity(Class<?> clazz) {
-		for (IActivityDescribable aty : aties) {
+		for (IActivityFunction aty : aties) {
 			if (aty.getClass().equals(clazz)) {
 				finishActivity((Activity) aty);
 			}
@@ -128,7 +125,7 @@ public class XActivityManager {
 	 * 结束所有activity
 	 */
 	public void finishAllActivity() {
-		for (IActivityDescribable aty : aties) {
+		for (IActivityFunction aty : aties) {
 			finishActivity((Activity) aty);
 		}
 	}
